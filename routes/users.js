@@ -7,17 +7,13 @@ router.post("/", async (req, res) => {
   const { fname, lname, username, email } = req.body;
 
   try {
-    // const post = await Post.findById(req.params.postId).populate("comments");
     const user = new User({ fname, lname, username, email });
-    // const user = await User.findById(req.user.id);
-    // comment.createdBy.push(user);
     const newUser = await user.save();
     res.status(200).json({
       success: true,
       newUser,
     });
   } catch (e) {
-    console.log(e.message);
     res.status(400).json({
       success: false,
       message: "unable to create user",
@@ -25,26 +21,99 @@ router.post("/", async (req, res) => {
   }
 });
 
-// router.get("/", (req, res, next) => {
-//   // res.status(200).json({
-//   //   users,
-//   //   success: true,
-//   // });
-//   res.body = users;
-//   next();
-// });
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (users) {
+      res.status(200).json({
+        success: true,
+        users,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "no users",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+  }
+});
 
-// router.get("/:id", (req, res, next) => {
-//   const user = users.find((user) => user.id === parseInt(req.params.id));
+router.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (user) {
+      res.status(200).json({
+        success: true,
+        user: user,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "cannot find user",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+  }
+});
 
-//   if (user) {
-//     res.status(200).json({ user, success: true });
-//   } else {
-//     res.status(404);
-//   }
-//   res.body = user;
+router.delete("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (deletedUser) {
+      res.status(200).json({
+        success: true,
+        deletedUser,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "unable to delete user",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+    console.log(e.message);
+  }
+});
 
-//   next();
-// });
+router.put("/:id", async (req, res) => {
+  const { username, email } = req.body;
+  const { id } = req.params;
+  try {
+    const changeUser = await User.findByIdAndUpdate(id, { username, email });
+    const updatedUser = await changeUser.save();
+    console.log(updatedUser);
+    if (updatedUser) {
+      res.status(200).json({
+        success: true,
+        updatedUser,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Unable to change user.",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+  }
+});
 
 module.exports = router;
