@@ -3,7 +3,7 @@ const app = express();
 const port = 3000;
 const usersRouter = require("./routes/users.js");
 // const postsRouter = require("./routes/posts.js");
-// const commentsRouter = require("./routes/comments.js");
+const commentsRouter = require("./routes/comments.js");
 
 require("dotenv").config();
 const mongoose = require("mongoose");
@@ -25,7 +25,7 @@ db.once("open", () => {
 
 app.use("/api/users", usersRouter);
 // app.use("/api/posts", postsRouter);
-// app.use("/api/comments", commentsRouter);
+app.use("/api/comments", commentsRouter);
 
 app.listen(port, () => {
   console.log(`Server is listening on port: ${port}`);

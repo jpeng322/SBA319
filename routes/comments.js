@@ -1,55 +1,120 @@
 const express = require("express");
-const CommentSchema = require("../models/comments.js");
-
 router = express.Router();
-router.get("/", (req, res, next) => {
-  // res.status(200).json({
-  //   comments,
-  //   success: true,
-  // });
+const Comment = require("../models/comments.js");
 
-  res.body = comments;
-  next();
-});
+router.post("/", async (req, res) => {
+  const { title, description, username, postId } = req.body;
 
-router.get("/:id", (req, res, next) => {
-  const comment = comments.find(
-    (comment) => comment.id === parseInt(req.params.id)
-  );
-
-  if (comment) {
+  try {
+    const comment = new Comment({ title, description, username, postId });
+    const newComment = await comment.save();
     res.status(200).json({
-      comment,
       success: true,
+      newComment,
     });
-    res.body = comment;
-  } else {
-    res.status(404);
+  } catch (e) {
+    res.status(400).json({
+      success: false,
+      message: "Unable to create comment.",
+    });
   }
-  next();
 });
 
-router.post("/", (req, res, next) => {
-  const { description, username, postId } = req.body;
-
-  if (description && username && postId) {
-    const comment = {
-      id: comments[comments.length - 1]?.id + 1 || 1,
-      postId,
-      username,
-      description,
-    };
-
-    comments.push(comment);
-    updateFile("./data/comments.js", comments);
-    res.status(201).json({
-      comment,
-      success: true,
+router.get("/", async (req, res) => {
+  try {
+    const comment = await Comment.find({});
+    if (comment) {
+      res.status(200).json({
+        success: true,
+        comment,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "No comments",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
     });
-    res.body = comment;
-  } else {
-    res.status(400);
   }
-  next();
 });
+
+router.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const comment = await Comment.findById(id);
+    if (comment) {
+      res.status(200).json({
+        success: true,
+        comment,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Cannot find comment.",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const deletedUser = await Comment.findByIdAndDelete(id);
+    if (deletedUser) {
+      res.status(200).json({
+        success: true,
+        deletedUser,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "unable to delete user",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+    console.log(e.message);
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const { description } = req.body;
+  const { id } = req.params;
+  try {
+    const updatedComment = await Comment.findByIdAndUpdate(
+      id,
+      { description },
+      { new: true }
+    );
+    if (updatedComment) {
+      res.status(200).json({
+        success: true,
+        updatedComment,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Unable to change comment.",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      sucess: false,
+      message: e.message,
+    });
+  }
+});
+
 module.exports = router;
