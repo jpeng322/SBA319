@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const usersRouter = require("./routes/users.js");
-// const postsRouter = require("./routes/posts.js");
+const postsRouter = require("./routes/posts.js");
 const commentsRouter = require("./routes/comments.js");
 
 require("dotenv").config();
@@ -24,7 +24,7 @@ db.once("open", () => {
 
 
 app.use("/api/users", usersRouter);
-// app.use("/api/posts", postsRouter);
+app.use("/api/posts", postsRouter);
 app.use("/api/comments", commentsRouter);
 
 app.listen(port, () => {

@@ -1,90 +1,37 @@
 const express = require("express");
 router = express.Router();
-const Comment = require("../models/comments.js");
-router.get("/", (req, res, next) => {
-  // console.log(posts, "THIS IS THE POSTS");
-  // res.render("posts.pug", {
-  //   title: "Posts",
-  //   posts: posts,
-  //   header: "GET - POSTS",
-  // });
-  // res.status(200).json({
-  //   posts,
-  //   success: true,
-  // });
-
-  res.body = posts;
-  next();
-});
-
-router.get("/:id", (req, res, next) => {
-  const post = posts.find((post) => post.id === parseInt(req.params.id));
-  if (post) {
-    res.status(200).json({
-      post,
-      success: true,
-    });
-    res.body = post;
-  } else {
-    res.status(404);
-  }
-  next();
-});
-
-router.post("/", (req, res, next) => {
-  const { title, description, username } = req.body;
-
-  if (title && description && username) {
-    const post = {
-      id: posts[posts.length - 1]?.id + 1 || 1,
-      title,
-      description,
-      username,
-    };
-
-    posts.push(post);
-    updateFile("./data/posts.js", posts);
-    res.status(201).json({
-      post,
-      success: true,
-    });
-    res.body = post;
-  } else {
-    res.status(400);
-  }
-  next();
-});
+const Post = require("../models/posts.js");
 
 router.post("/", async (req, res) => {
   const { title, description, username } = req.body;
 
   try {
-    const comment = new Comment({ title, description, username });
-    const newComment = await comment.save();
+    const post = new Post({ title, description, username });
+    const newPost = await post.save();
     res.status(200).json({
       success: true,
-      newComment,
+      newPost,
     });
   } catch (e) {
     res.status(400).json({
       success: false,
-      message: "Unable to create comment.",
+      message: "Unable to create post.",
     });
   }
 });
 
 router.get("/", async (req, res) => {
   try {
-    const comment = await Comment.find({});
-    if (comment) {
+    const post = await Post.find({});
+    if (post) {
       res.status(200).json({
         success: true,
-        comment,
+        post,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: "No comments",
+        message: "No posts",
       });
     }
   } catch (e) {
@@ -98,16 +45,16 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const comment = await Comment.findById(id);
-    if (comment) {
+    const post = await Post.findById(id);
+    if (post) {
       res.status(200).json({
         success: true,
-        comment,
+        post,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: "Cannot find comment.",
+        message: "Cannot find post.",
       });
     }
   } catch (e) {
@@ -121,16 +68,16 @@ router.get("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const deletedUser = await Comment.findByIdAndDelete(id);
-    if (deletedUser) {
+    const deletedPost = await Post.findByIdAndDelete(id);
+    if (deletedPost) {
       res.status(200).json({
         success: true,
-        deletedUser,
+        deletedPost,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: "unable to delete user",
+        message: "Unable to delete post",
       });
     }
   } catch (e) {
@@ -146,18 +93,20 @@ router.put("/:id", async (req, res) => {
   const { description } = req.body;
   const { id } = req.params;
   try {
-    const changeComment = await Comment.findByIdAndUpdate(id, { description });
-    const updatedComment = await changeComment.save();
-    console.log(updatedComment);
-    if (updatedComment) {
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { description },
+      { new: true }
+    );
+    if (updatedPost) {
       res.status(200).json({
         success: true,
-        updatedComment,
+        updatedPost,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: "Unable to change comment.",
+        message: "Unable to change post.",
       });
     }
   } catch (e) {

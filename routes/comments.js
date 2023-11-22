@@ -68,16 +68,16 @@ router.get("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const deletedUser = await Comment.findByIdAndDelete(id);
-    if (deletedUser) {
+    const deletedComment = await Comment.findByIdAndDelete(id);
+    if (deletedComment) {
       res.status(200).json({
         success: true,
-        deletedUser,
+        deletedComment,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: "unable to delete user",
+        message: "Unable to delete comment",
       });
     }
   } catch (e) {
