@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const validateEmail = function (email) {
-  const re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const re =
+    /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   return re.test(email);
 };
 
@@ -23,11 +24,11 @@ const UserSchema = new Schema({
   email: {
     unique: true,
     type: String,
-    // validate: [validateEmail, "Please fill a valid email address"],
-    // match: [
-    //   /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-    //   "Please fill a valid email address",
-    // ],
+    validate: [validateEmail, "Please fill a valid email address"],
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please fill a valid email address",
+    ],
   },
   createdAt: {
     type: Date,

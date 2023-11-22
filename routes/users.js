@@ -14,10 +14,17 @@ router.post("/", async (req, res) => {
       newUser,
     });
   } catch (e) {
-    res.status(400).json({
-      success: false,
-      message: "unable to create user",
-    });
+    if (e.name === "ValidationError") {
+      res.status(400).json({
+        success: false,
+        message: Object.values(e.errors).map((val) => val.message),
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: e.message,
+      });
+    }
   }
 });
 
